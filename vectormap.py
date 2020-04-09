@@ -195,7 +195,7 @@ def Vector(h5Files):
     VectorOrigins = [(x, y) for x in range(1, kernel_sx+1) for y in range(1, kernel_sy+1)]
     QuiverOriginsX, QuiverOriginsY = [], [] #np.meshgrid([x for x in range(1, sx+1)], [y for y in range(1, sy+1)])
     QuiverU, QuiverV = [], []
-    #VectorDict = {}
+
     print('Calculating Vectors')
     for x, y in tqdm(VectorOrigins):
         QuiverOriginsX.append(x*Xkernel_size)
@@ -208,13 +208,8 @@ def Vector(h5Files):
         amp, phaseshift = curve_fit(_Cosfunc, x_data, average_data, bounds=((0, -np.inf), (np.inf, np.inf)))[0]
         QuiverU.append(amp*np.cos(phaseshift*np.pi/180))
         QuiverV.append(amp*np.sin(phaseshift*np.pi/180))
-    plt.quiver(QuiverOriginsX, QuiverOriginsY, 2*QuiverU, 2*QuiverV, color='red')
-    plt.savefig('./quivertest.png')
-    plt.show()
-    asdf
-    #for key, val in VectorDict.items():
-    #prnt(VectorDict)
-    return y_dataStack[3]
+        
+    return QuiverOriginsX, QuiverOriginsY, QuiverU, QuiverV
 
 def main(args):
     path = os.path.join('./data',args.dataset)
@@ -306,8 +301,11 @@ def main(args):
         h5file.Piezoresponse(15, 13, fix=True)
 
         h5Files[i] = h5file
-    Vector(h5Files)
-    #print('Result images are saved!')
+    QuiverOriginsX, QuiverOriginsY, QuiverU, QuiverV = Vector(h5Files)
+    plt.quiver(QuiverOriginsX, QuiverOriginsY, 10*QuiverU, 10*QuiverV, color='red')
+    plt.savefig('./quivertest_noamp.png')
+    plt.show()
+    
     return 0
 
     ## TODO: Monte-Carlo method in paper to calculate alignment accurately
