@@ -141,8 +141,18 @@ def h5toimg(h5, channel):
     img = ((img+abs(np.amin(img)))/(np.amax(img)-np.amin(img))*255)
     return img.astype(np.uint8), ColorMap(cmap)
 
+def h5todata(h5, channel):
+    channel = 'Channel_' + str(channel).zfill(3)
+    img = usid.USIDataset(h5[channel+'/Raw_Data'])
+    height, width = getDim(h5, channel)[:2]
+    img = np.flip(np.reshape(img, (height, width)), axis=0)
+    return img
+
 def ibw2img(ibw, channel):
     return h5toimg(ibw2h5(ibw), channel)
+
+def ibw2data(ibw, channel):
+    return h5todata(ibw2h5(ibw), channel)
 
 def h5toChannelName(h5, channel):
     channels = channel_list(h5)
